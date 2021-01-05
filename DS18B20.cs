@@ -35,15 +35,20 @@ namespace OneWireTempLib
         {
             byte resolution = (byte)((scratchpad[4] >> 5) & 0x3);
             int rawRes = scratchpad[0] | (scratchpad[1] << 8);
-            float temp;
+            float temp = 1;
+            if ((rawRes & 0x8000) > 0)
+            {
+                rawRes = (rawRes ^ 0xffff) + 1;
+                temp = -1;
+            }
             if (resolution == Resolution12Bit)
-                temp = rawRes / 16.0f;
+                temp = temp * (rawRes / 16.0f);
             else if (resolution == Resolution11Bit)
-                temp = (rawRes >> 1) / 8.0f;
+                temp = temp * ((rawRes >> 1) / 8.0f);
             else if (resolution == Resolution10Bit)
-                temp = (rawRes >> 2) / 4.0f;
+                temp = temp * ((rawRes >> 2) / 4.0f);
             else if (resolution == Resolution9Bit)
-                temp = (rawRes >> 3) / 2.0f;
+                temp = temp * ((rawRes >> 3) / 2.0f);
             else
                 throw new NotImplementedException();
 
