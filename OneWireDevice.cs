@@ -47,9 +47,6 @@ namespace OneWireTempLib
             uart.Reset();
             uart.WriteByte(RomCommands.ReadRom);
             byte[] romCode = uart.ReadBytes(8);
-            //crc = crc8(rom_code[0:7])
-            //if crc != iord(rom_code, 7):
-            //    raise CRCError('read_ROM CRC error')
             return romCode;
         }
 
@@ -126,6 +123,17 @@ namespace OneWireTempLib
             return bytes.ToArray();
         }
 
+        /// <summary>
+        /// SEARCH ROM [F0h]
+        /// When a system is initially powered up, the master must identify the ROM codes of all slave devices on
+        /// the bus, which allows the master to determine the number of slaves and their device types.The master
+        /// learns the ROM codes through a process of elimination that requires the master to perform a Search ROM
+        /// cycle(i.e., Search ROM command followed by data exchange) as many times as necessary to identify all
+        /// of the slave devices.If there is only one slave on the bus, the simpler Read ROM command (see below)
+        /// can be used in place of the Search ROM process. For a detailed explanation of the Search ROM
+        /// procedure, refer to the iButton® Book of Standards at www.maxim-ic.com/ibuttonbook.After every
+        /// Search ROM cycle, the bus master must return to Step 1 (Initialization) in the transaction sequence.
+        /// </summary>
         private void Search(List<byte[]> completeRoms, List<byte[]> partialRoms, byte[] curROM = null, bool alarm = false)
         {
             List<byte> currentROM = new List<byte>();
@@ -174,16 +182,6 @@ namespace OneWireTempLib
         }
 
         /// <summary>
-        /// SEARCH ROM [F0h]
-        /// When a system is initially powered up, the master must identify the ROM codes of all slave devices on
-        /// the bus, which allows the master to determine the number of slaves and their device types.The master
-        /// learns the ROM codes through a process of elimination that requires the master to perform a Search ROM
-        /// cycle(i.e., Search ROM command followed by data exchange) as many times as necessary to identify all
-        /// of the slave devices.If there is only one slave on the bus, the simpler Read ROM command (see below)
-        /// can be used in place of the Search ROM process. For a detailed explanation of the Search ROM
-        /// procedure, refer to the iButton® Book of Standards at www.maxim-ic.com/ibuttonbook.After every
-        /// Search ROM cycle, the bus master must return to Step 1 (Initialization) in the transaction sequence.
-        /// 
         /// ALARM SEARCH [ECh]
         /// The operation of this command is identical to the operation of the Search ROM command except that
         /// only slaves with a set alarm flag will respond. This command allows the master device to determine if
